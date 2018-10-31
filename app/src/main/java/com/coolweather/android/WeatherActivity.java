@@ -11,6 +11,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -33,6 +34,8 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
+import static android.content.ContentValues.TAG;
+
 public class WeatherActivity extends AppCompatActivity {
 
     private ScrollView weatherLayout;
@@ -50,6 +53,12 @@ public class WeatherActivity extends AppCompatActivity {
     public SwipeRefreshLayout swipeRefresh;
     public DrawerLayout drawerLayout;
     private Button navButton;
+
+    public void setWeatherId(String weatherId) {
+        this.weatherId = weatherId;
+    }
+
+    private String weatherId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,21 +96,25 @@ public class WeatherActivity extends AppCompatActivity {
             loadBingPic();
         }
         String weatherString = prefs.getString("weather", null);
-        final String weatherId;
+
         if (weatherString != null){
             //有缓存时直接解析天气数据
             Weather weather = Utility.handleWeatherResponse(weatherString);
             weatherId = weather.basic.weatherId;
+            Log.d(TAG,"ID3:" + weatherId);
             showWeatherInfo(weather);
         }else {
             //无缓存时区服务器查询天气
-            weatherId = getIntent().getStringExtra("weather_id");
+         //   weatherId = getIntent().getStringExtra("weather_id");
+            Log.d(TAG,"ID5:" + weatherId);
             weatherLayout.setVisibility(View.INVISIBLE);
             requestWeather(weatherId);
+
         }
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                Log.d(TAG,"ID4:" + weatherId);
                 requestWeather(weatherId);
             }
         });
@@ -113,6 +126,8 @@ public class WeatherActivity extends AppCompatActivity {
             }
         });
     }
+
+
 
     /**
      * 根据天气id请求城市天气信息

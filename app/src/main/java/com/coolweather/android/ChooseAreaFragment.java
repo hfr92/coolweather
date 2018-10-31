@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,8 @@ import java.util.List;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * Created by hp on 2018/8/29.
@@ -107,16 +110,22 @@ public class ChooseAreaFragment extends Fragment {
                     queryCounties();
                 }else if (currentLevel == LEVEL_COUNTY){
                     String weatherId = countyList.get(position).getWeatherId();
+                    Log.d(TAG,"ID:" + weatherId);
                     if (getActivity() instanceof MainActivity) {
                         Intent intent = new Intent(getActivity(), WeatherActivity.class);
                         intent.putExtra("weather_id", weatherId);
                         startActivity(intent);
                         getActivity().finish();
-                    }else if (getActivity() instanceof WeatherActivity){
+                    }else if (getActivity() instanceof WeatherActivity){;
                         WeatherActivity activity = (WeatherActivity)getActivity();
-                        activity.drawerLayout.closeDrawers();;
+                        activity.drawerLayout.closeDrawers();
+                        // TODO: 2018/10/31  从侧边选中城市后，再重写刷新时，城市会出现混乱，
+                        // 因为没有把新的weatherId传到weatheractivity中 。所以用set方法将weatherId放入
+                        activity.setWeatherId(weatherId);
                         activity.swipeRefresh.setRefreshing(true);
                         activity.requestWeather(weatherId);
+                        Log.d(TAG,"ID2:" + weatherId);
+
                     }
                 }
             }
